@@ -17,7 +17,7 @@ public class TestingWindow extends JFrame
 		// After each line is written run the program and check it verse the key image in your lab
 		// Note: after doing the load method you will need to uncomment the 1st 2 lines
 		
-		original		= ImageTools2.load("C:\\Users\\othscs097\\Desktop\\Image-Tools\\src\\circle.png");
+		original		= ImageTools2.load("C:\\Users\\varun\\Desktop\\Image-Tools\\src\\circle.png");
 		images[0][0]	= original;
 		images[0][1]	= ImageTools2.copy(original);
 		//images[0][2]	= ImageTools2.scale(original,.25,.25);

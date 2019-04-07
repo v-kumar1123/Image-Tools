@@ -195,11 +195,11 @@ public class ImageTools2 {
         for(int x=0;x<img.getWidth();x++) {
             //TODO: 4/4/19 HEY GUYS DONT FORGET TO DO THIS!!!
             for(int y=0;y<img.getHeight();y++) {
-                if(img.getRGB(x,y)+((100/lightenFactor)*img.getRGB(x,y))>255) {
+                if(img.getRGB(x,y)+((lightenFactor)*img.getRGB(x,y))>255) {
                     lightened.setRGB(x,y,255);
                 }
                 else {
-                    lightened.setRGB(x,y,(int)(img.getRGB(x,y)+((lightenFactor/100)*img.getRGB(x,y))));
+                    lightened.setRGB(x,y,(int)(img.getRGB(x,y)+((lightenFactor)*img.getRGB(x,y))));
                 }
             }
         }
