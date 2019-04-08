@@ -21,7 +21,7 @@ public class TestingWindow extends JFrame
 		images[0][0]	= original;
 		images[0][1]	= ImageTools2.copy(original);
 		//images[0][2]	= ImageTools2.scale(original,.25,.25);
-		//images[0][3]	= ImageTools2.scale(original,10,10);
+		images[0][3]	= ImageTools2.scale(original,10,10);
 		//images[1][0]	= ImageTools2.rotate(original,25);
 		//images[1][1]	= ImageTools2.rotate(original,90);
 		//images[1][2]	= ImageTools2.removePixels(original,.25);

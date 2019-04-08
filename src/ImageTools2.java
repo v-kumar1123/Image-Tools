@@ -1,5 +1,8 @@
 import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
@@ -41,7 +44,16 @@ public class ImageTools2 {
      * null is returned if the received image is null.
      */
     public static BufferedImage copyWithTransparency(BufferedImage img) {
-        return null;
+        if(img==null) {
+            return  null;
+        }
+        BufferedImage transparent=new BufferedImage(img.getWidth(),img.getHeight(),TYPE_INT_ARGB);
+        for(int x=0;x<img.getWidth();x++) {
+            for (int y = 0; y < img.getHeight(); y++) {
+                transparent.setRGB(x,y,img.getRGB(x,y));
+            }
+        }
+        return transparent;
         //TYPE_INT_ARGB – RGB color with transparency
     }
 
@@ -52,8 +64,12 @@ public class ImageTools2 {
      * @return returns true if the image has a transparent mode and false otherwise.
      */
     public static boolean hasTransparency(BufferedImage img) {
-        //
-        return false;
+        if(img.getType()==TYPE_INT_ARGB) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
@@ -65,8 +81,7 @@ public class ImageTools2 {
      * @return creates and returns a scaled copy of the received image,
      * null is returned if the received image is null or if non-positive scales are provided
      */
-    public static BufferedImage scale(BufferedImage img, double horizontalScale,
-                                      double verticalScale) {
+    public static BufferedImage scale(BufferedImage img, double horizontalScale, double verticalScale) {
         return null;
     }
 
@@ -79,9 +94,23 @@ public class ImageTools2 {
      * @return creates and returns a scaled copy of the received image,
      * null is returned if the received image is null or if non-positive dimensions are provided
      */
-    public static BufferedImage scale(BufferedImage img, int newWidth,
-                                      int newHeight) {
-        return null;
+    public static BufferedImage scale(BufferedImage img, int newWidth, int newHeight) {
+        BufferedImage scaled=null;
+        if(img==null) {
+            return null;
+        }
+        for(int x=0;x<img.getWidth();x++) {
+            for(int y=0;y<img.getHeight();y++) {
+                if(img!=null) {
+                    scaled=new BufferedImage(newWidth,newHeight,img.getColorModel().getTransparency());
+                    Graphics2D g=(Graphics2D) scaled.getGraphics();
+                    AffineTransform affineTransform=new AffineTransform();
+                    affineTransform.scale(newWidth/img.getWidth(),newHeight/img.getHeight());
+                    g.drawImage(img,affineTransform,null);
+                }
+            }
+        }
+        return scaled;
     }
 
     /**
@@ -184,25 +213,37 @@ public class ImageTools2 {
      * Factor value is provided.
      * Note: any colors that end up being larger than 255 will be changed to 255.
      */
+    
+    //NOT WORKING
     public static BufferedImage lighten(BufferedImage img, double lightenFactor) {
         BufferedImage lightened=new BufferedImage(img.getWidth(),img.getHeight(),TYPE_INT_ARGB);
-
         for(int x=0;x<img.getWidth();x++) {
             for (int y = 0; y < img.getHeight(); y++) {
                 lightened.setRGB(x,y,img.getRGB(x,y));
             }
-        }
+        }/*
         for(int x=0;x<img.getWidth();x++) {
             //TODO: 4/4/19 HEY GUYS DONT FORGET TO DO THIS!!!
             for(int y=0;y<img.getHeight();y++) {
-                if(img.getRGB(x,y)+((lightenFactor)*img.getRGB(x,y))>255) {
-                    lightened.setRGB(x,y,255);
+                Color color=new Color(lightened.getRGB(x,y));
+                if((int)(color.getRed()+lightenFactor*color.getRed())>255||(int)(color.getBlue()+lightenFactor*color.getBlue())>255||(int)(color.getGreen()+lightenFactor*color.getGreen())>255) {
+                    if((int)(color.getRed()+lightenFactor*color.getRed())>255) {
+                        color=new Color(255,color.getBlue(),color.getGreen());
+                    }
+                    if((int)(color.getBlue()+lightenFactor*color.getBlue())>255) {
+                        color=new Color(color.getRed(),255,color.getGreen());
+                    }
+                    if((int)(color.getGreen()+lightenFactor*color.getGreen())>255) {
+                        color=new Color(color.getRed(),color.getBlue(),255);
+                    }
+                    lightened.setRGB(x,y,color.getRGB());
                 }
                 else {
-                    lightened.setRGB(x,y,(int)(img.getRGB(x,y)+((lightenFactor)*img.getRGB(x,y))));
+                    color=new Color((int)(color.getRed()+color.getRed()*lightenFactor),(int)(color.getBlue()+color.getBlue()*lightenFactor),(int)(color.getGreen()+lightenFactor*color.getGreen()));
+                    lightened.setRGB(x,y,color.getRGB());
                 }
             }
-        }
+        }*/
         return lightened;
     }
 
