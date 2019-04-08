@@ -1,6 +1,7 @@
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -144,7 +145,27 @@ public class ImageTools2 {
      * null is returned if the received image is null or if an invalid flipping value is provided
      */
     public static BufferedImage flip(BufferedImage img, int type) {
-        return null;
+        BufferedImage flipped=copyWithTransparency(img);
+
+        if(type==VERTICAL_FLIP) {
+            AffineTransform affineTransform = AffineTransform.getScaleInstance(1, -1);
+            affineTransform.translate(0, -img.getHeight(null));
+            AffineTransformOp op = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+            flipped = op.filter(img, null);
+
+            return flipped;
+        }
+
+
+        else if(type==HORIZONTAL_FLIP) {
+            AffineTransform affineTransform = AffineTransform.getScaleInstance(1, -1);
+            affineTransform.translate(-img.getWidth(null),0);
+            AffineTransformOp op = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+            flipped = op.filter(img, null);
+
+            return flipped;
+        }
+
     }
 
     /**
@@ -225,7 +246,21 @@ public class ImageTools2 {
      * Note: any fade greater than 1 will be reduced to 1
      */
     public static BufferedImage fade(BufferedImage img, double fade) {
-        return null;
+        if(img==null||fade<=0) {
+            return null;
+        }
+        BufferedImage faded=copyWithTransparency(img);
+        Color color;
+        for(int x=0;x<img.getWidth();x++) {
+            for(int y=0;y<img.getHeight();y++) {
+                color=new Color(faded.getRGB(x,y),true);
+                color=new Color(color.getRed(),color.getGreen(),color.getBlue(),(int)(color.getAlpha()*(1-fade)));
+
+                faded.setRGB(x,y,color.getRGB());
+            }
+        }
+
+        return faded;
     }
 
     /**
