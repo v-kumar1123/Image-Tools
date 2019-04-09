@@ -1,8 +1,7 @@
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
+import java.awt.image.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.nio.Buffer;
@@ -158,13 +157,34 @@ public class ImageTools2 {
 
 
         else if(type==HORIZONTAL_FLIP) {
-            AffineTransform affineTransform = AffineTransform.getScaleInstance(1, -1);
+            AffineTransform affineTransform = AffineTransform.getScaleInstance(-1, 1);
             affineTransform.translate(-img.getWidth(null),0);
             AffineTransformOp op = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
             flipped = op.filter(img, null);
 
             return flipped;
         }
+
+        else if(type==DOUBLE_FLIP) {
+            double angle = 180;
+// Creates the transform for the rotation
+            AffineTransform affineTransform = new AffineTransform();
+            affineTransform.setToTranslation(0,0);
+            affineTransform.rotate(Math.toRadians(angle), img.getWidth()/2, img.getHeight()/2);
+// Stores the transparency of the original image
+            int transparency = img.getColorModel().getTransparency();
+// Creates an image to store the rotated version of the original image
+            BufferedImage rotated =
+                    new BufferedImage( img.getWidth(), img.getHeight(), transparency);
+// gets the graphics of the destination image.
+            Graphics2D g = (Graphics2D) (rotated.getGraphics());
+// draws the original image onto the destination image, with the correct rotation
+            g.drawImage(img, affineTransform, null);
+            return rotated;
+        }
+
+
+        return null;
 
     }
 
@@ -177,7 +197,17 @@ public class ImageTools2 {
      * Null is returned if the received image is null.
      */
     public static BufferedImage blur(BufferedImage img) {
-        return null;
+        //SOURCED FROM STACK OVERFLOW
+        BufferedImage blurred=copyWithTransparency(img);
+
+        Kernel kernel = new Kernel(3, 3,
+
+        new float[] {1f/9f, 1f/9f, 1f/9f, 1f/9f, 1f/9f, 1f/9f, 1f/9f, 1f/9f, 1f/9f});
+
+        BufferedImageOp tempImage = new ConvolveOp(kernel);
+        blurred = tempImage.filter(blurred, null);
+
+        return blurred;
     }
 
     /**
@@ -216,7 +246,37 @@ public class ImageTools2 {
      * received image is null or if non-positive percentage is provided.
      */
     public static BufferedImage removePixels(BufferedImage img, double percentToRemove) {
-        return null;
+        BufferedImage pixelsRemoved= copyWithTransparency(img);
+        /*
+        for(int x=0;x<pixelsRemoved.getWidth();x++) {
+            for(int y=0;y<pixelsRemoved.getHeight();y++) {
+                if()
+            }
+        }*/
+        int visiblePixels=0;
+        for(int x=0;x<pixelsRemoved.getWidth();x++) {
+            for(int y=0;y<pixelsRemoved.getHeight();y++) {
+                if(new Color(pixelsRemoved.getRGB(x,y)).getAlpha()!=0) {
+                    visiblePixels++;
+                }
+            }
+        }
+        int f=(int)(percentToRemove*(visiblePixels));
+        int x=(int)(Math.random()*pixelsRemoved.getWidth()),y=(int)(Math.random()*pixelsRemoved.getHeight());
+        do {
+            if(new Color(pixelsRemoved.getRGB(x,y)).getAlpha()!=0) {
+                Color color=new Color(pixelsRemoved.getRGB(x,y));
+                color=new Color(color.getRed(),color.getGreen(),color.getBlue(),0);
+
+                pixelsRemoved.setRGB(x,y,color.getRGB());
+                f--;
+            }
+            x=(int)(Math.random()*pixelsRemoved.getWidth());
+            y=(int)(Math.random()*pixelsRemoved.getHeight());
+        }while (f>0);
+        return pixelsRemoved;
+
+
     }
 
     /**
@@ -232,7 +292,28 @@ public class ImageTools2 {
      * remove as many as it can.
      */
     public static BufferedImage removePixels(BufferedImage img, int numToRemove) {
-        return null;
+        BufferedImage pixelsRemoved= copy(img);
+        /*
+        for(int x=0;x<pixelsRemoved.getWidth();x++) {
+            for(int y=0;y<pixelsRemoved.getHeight();y++) {
+                if()
+            }
+        }*/
+        int f=numToRemove;
+        int x=(int)(Math.random()*pixelsRemoved.getWidth()),y=(int)(Math.random()*pixelsRemoved.getHeight());
+        do {
+            if(new Color(pixelsRemoved.getRGB(x,y)).getAlpha()!=0) {
+                Color color=new Color(pixelsRemoved.getRGB(x,y));
+                color=new Color(color.getRed(),color.getGreen(),color.getBlue(),0);
+
+                pixelsRemoved.setRGB(x,y,color.getRGB());
+                f--;
+            }
+
+            x=(int)(Math.random()*pixelsRemoved.getWidth());
+            y=(int)(Math.random()*pixelsRemoved.getHeight());
+        }while (f>0);
+        return pixelsRemoved;
     }
 
     /**
